@@ -2,7 +2,7 @@
 
 This tiny library blends multiple projectile motions in 1D. This is useful when, for example, time-shifted motion estimates need to be integrated into a smooth motion trajectory and more complex filters such as Kalman are not an option. 
 
-The image below shows two projectile motion estimates arriving at the integrator at different times. The integrator follows `motion 1` up to the integration point `now` at which is blends smoothly to `motion 2` during `horizon`.
+The image below shows two projectile motion estimates arriving at the integrator at different times. The integrator follows `motion1` up to the integration point `now` at which is blends smoothly to `motion2` during `horizon`.
 
 <div align="center">
   <img src=./etc/simple.svg>
@@ -10,12 +10,12 @@ The image below shows two projectile motion estimates arriving at the integrator
 
 ### Properties
 
-Motions are polynomial (per default of order 2). The blending motion is a piecewise function
- - if `t < now` use `motion 1`
- - if `t > now + horizon` use `motion 2`
- - else use a smoothing polynomial defined below.
+Motions are polynomial (per default of order 2). The blending motion is a piecewise function, composed as follows
+ - `motion1(t)` if `t < now`
+ - `motion2(t)` if  `t > now + horizon`
+  - `blend(t)` otherwise (smoothing polynomial defined below).
 
-The smoothing polynomial of order 3 having the following smoothness properties
+The smoothing function `blend` is an order 3 polynomial having the following smoothness properties
  - at `now` the position `x` equals `motion 1`
  - at `now+horizon` the position `x` equals `motion 2`
  - d/dt matches d/dt of `motion1` at `now`
