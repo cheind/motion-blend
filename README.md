@@ -10,11 +10,16 @@ The image below shows two projectile motion estimates arriving at the integrator
 
 ### Properties
 
-Motions are polynomial (per default of order 2). The blending is polynomial of order 3 with having the following smoothness properties
+Motions are polynomial (per default of order 2). The blending motion is a piecewise function
+ - if `t < now` use `motion 1`
+ - if `t > now + horizon` use `motion 2`
+ - else use a smoothing polynomial defined below.
+
+The smoothing polynomial of order 3 having the following smoothness properties
  - at `now` the position `x` equals `motion 1`
  - at `now+horizon` the position `x` equals `motion 2`
  - d/dt matches d/dt of `motion1` at `now`
- - d/dt matches d/dt of `motion2` at `now+horizon`
+ - d/dt matches d/dt of `motion2` at `now+horizon`.
 
 Blended motions are composable, so that blending might occur recursively as the following example shows
 
@@ -26,19 +31,34 @@ Blended motions are composable, so that blending might occur recursively as the 
 See [`__main__.py`](mblend/__main__.py) for a complete listing
 
 ```python
+import numpy as np
+
 from mblend import PolynomialMotion, PolynomialMotionBlend
 
-# Two motions with vectorized .at and .d_at methods
+# Two motions providing vectorized .at(t) and .d_at(t) methods
 m1 = PolynomialMotion(offset=0.0, coeffs=[-0.8, 1.0, 0.5])
 m2 = PolynomialMotion(offset=1.0, coeffs=[0, 3.0, 5.0])
 
 tnow = 2.5
 h = 2.0
 
-# Another motion that blends
+# Blended motion between m1 & m2. Same interface
 blend = PolynomialMotionBlend(m1, m2, tnow, h)
 
 # Blended motions are blendable
-m3 = MotionEstimate(coeffs=[1.2, 5.0, 7.0], t0=3.0)
+m3 = PolynomialMotion(offset=3.0, coeffs=[1.2, 5.0, 7.0])
 bblend = PolynomialMotionBlend(blend, m2, 3.5, h)
+
+t = np.linspace(0,10,100)
+x = bblend.at(t)
+dxdt = bblend.d_at(t)
 ``` 
+
+### Install
+To install run,
+
+```
+pip install git+https://github.com/cheind/motion-blend.git
+```
+
+which requires Python 3.9
