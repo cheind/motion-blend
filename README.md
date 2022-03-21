@@ -55,10 +55,7 @@ dxdt = bblend.d_at(t)
 ``` 
 
 ### Install
-To install run,
-
 ```
 pip install git+https://github.com/cheind/motion-blend.git
 ```
-
-which requires Python 3.9
+requires Python 3.9
