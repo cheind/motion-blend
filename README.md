@@ -24,8 +24,15 @@ The smoothing function `blend` is an order 3 polynomial having the following smo
 Blended motions are composable, so that blending might occur recursively as the following example shows
 
 <div align="center">
-  <img src=./etc/double_blend.svg>
+  <img src=./etc/double-blend-flatten=False.svg>
 </div>
+
+In real-time applications, i.e where `t` is monotonically increasing, repeated blending will lead to nested blending and hence stack issues. To mitigate this issue, **mblend** supports flattening older motions as shown below. Flattening might change the motion trajectories before the start of `blend2`, but is guaranteed to match the un-flattened trajectory for `t>=offset`.
+
+<div align="center">
+  <img src=./etc/double-blend-flatten=True.svg>
+</div>
+
 
 ### Code
 See [`__main__.py`](mblend/__main__.py) for a complete listing
@@ -47,7 +54,7 @@ blend = PolynomialMotionBlend(m1, m2, tnow, h)
 
 # Blended motions are blendable
 m3 = PolynomialMotion(offset=3.0, coeffs=[1.2, 5.0, 7.0])
-bblend = PolynomialMotionBlend(blend, m2, 3.5, h)
+bblend = PolynomialMotionBlend(blend, m2, 3.5, h, flatten=True)
 
 t = np.linspace(0,10,100)
 x = bblend.at(t)

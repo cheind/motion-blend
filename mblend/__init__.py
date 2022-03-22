@@ -2,6 +2,7 @@ from typing import Protocol, Union
 import dataclasses
 
 import numpy as np
+from numpy import isin
 
 
 class Motion(Protocol):
@@ -83,9 +84,8 @@ def poly_blend_3(m1: Motion, m2: Motion, tnow: float, h: float) -> PolynomialMot
     A[3, 3] = 0
     b[3] = m2.d_at(tnow + h)
 
-    coeffs = np.linalg.solve(A, b)
+    coeffs = np.linalg.solve(A, b) # TODO: handle singularities
     return PolynomialMotion(tnow, coeffs)
-
 
 @dataclasses.dataclass
 class PolynomialMotionBlend(Motion):
@@ -94,8 +94,12 @@ class PolynomialMotionBlend(Motion):
     offset: float
     horizon: float
     blend: Motion = dataclasses.field(init=False)
+    flatten: dataclasses.InitVar[bool] = False
 
-    def __post_init__(self):
+    def __post_init__(self, flatten:bool):
+        if flatten:
+            self.m1 = _flatten(self.m1, self.offset)
+            self.m2 = _flatten(self.m2, self.offset)
         self.blend = poly_blend_3(self.m1, self.m2, self.offset, self.horizon)
 
     def at(self, t: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -127,3 +131,19 @@ class PolynomialMotionBlend(Motion):
             return x.item()
         else:
             return x
+
+def _flatten(m: Motion, offset:float) -> Motion:        
+    """Recursively simplify older motions to avoid stacking of blends.
+    
+    The resulting motion is identical fo `t>=offset`, but may change for
+    values less than offset.
+    """
+    if isinstance(m, PolynomialMotionBlend):
+        if m.range[1] < offset:
+            return m.m2
+        elif m.range[0] < offset:
+            return m.blend
+        else:
+            return _flatten(m.m1, offset)
+    else:
+        return m

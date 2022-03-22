@@ -30,17 +30,17 @@ def simple():
     plt.show()
 
 
-def double_blend():
+def double_blend(flatten:bool):
     t = np.linspace(0, 10, 100)
 
     m1 = PolynomialMotion(offset=0.0, coeffs=[-0.8, 1.0, 0.5])
     m2 = PolynomialMotion(offset=1.0, coeffs=[0, 3.0, 5.0])
 
     h = 3.0
-    mb1 = PolynomialMotionBlend(m1, m2, 2.5, h)
+    mb1 = PolynomialMotionBlend(m1, m2, 2.5, h, flatten=flatten)
 
     m3 = PolynomialMotion(offset=3.0, coeffs=[1.2, 5.0, 7.0])
-    mb2 = PolynomialMotionBlend(mb1, m3, 3.5, h)
+    mb2 = PolynomialMotionBlend(mb1, m3, 3.5, h, flatten=flatten)
 
     fig, ax = plt.subplots()
     ax.plot(t[t >= m1.offset], m1.at(t[t >= m1.offset]), label="motion 1", linewidth=3)
@@ -52,14 +52,16 @@ def double_blend():
     ax.plot(t[mask], mb2.at(t[mask]), label="blend2")
     ax.axvline(2.5, linestyle="--", label="start blend1 1<->2", linewidth=1, c="k")
     ax.axvline(2.5 + h, linestyle=":", label="end blend1", linewidth=1, c="k")
-    ax.axvline(4.5, linestyle="--", label="start blend2 blend1<->3", linewidth=1)
-    ax.axvline(4.5 + h, linestyle=":", label="end blend2", linewidth=1)
+    ax.axvline(3.5, linestyle="--", label="start blend2 blend1<->3", linewidth=1)
+    ax.axvline(3.5 + h, linestyle=":", label="end blend2", linewidth=1)
     ax.set_xlabel("t")
     ax.set_ylabel("x")
     plt.legend(loc="lower center", ncol=2)
-    fig.savefig("etc/double_blend.svg")
+    fig.savefig(f"etc/double-blend-flatten={flatten}.svg")
     plt.show()
 
 
+
 simple()
-double_blend()
+double_blend(flatten=False)
+double_blend(flatten=True)
