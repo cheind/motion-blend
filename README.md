@@ -27,7 +27,7 @@ Blended motions are composable, so that blending might occur recursively as the 
   <img src=./etc/double-blend-flatten=False.svg>
 </div>
 
-In real-time applications, i.e where `t` is monotonically increasing, repeated blending will lead to nested blending and hence stack issues. To mitigate this issue, **mblend** supports flattening older motions as shown below. Flattening might change the motion trajectories before the start of `blend2`, but is guaranteed to match the un-flattened trajectory for `t>=offset`.
+In real-time applications, i.e where `t` is monotonically increasing, repeated blending will lead to nested blending and hence stack issues. To mitigate this issue, **mblend** supports flattening older motions as shown below. Flattening might change the motion trajectories before the start of `blend2`, but is guaranteed to match the un-flattened trajectory for `t>=start blend2`.
 
 <div align="center">
   <img src=./etc/double-blend-flatten=True.svg>
