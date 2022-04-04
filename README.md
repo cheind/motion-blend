@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/cheind/motion-blend/actions/workflows/python-package.yml/badge.svg)](https://github.com/cheind/motion-blend/actions/workflows/python-package.yml)
+
 # motion-blend
 
 This tiny library blends multiple projectile motions in 1D. This is useful when, for example, time-shifted motion estimates need to be integrated into a smooth motion trajectory and more complex filters such as Kalman are not an option. 
